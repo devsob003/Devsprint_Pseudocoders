@@ -111,6 +111,11 @@ const CustomWalletButton: FC<CustomWalletButtonProps> = ({ children }) => {
 		return "Select Wallet";
 	}, [children, connecting, connected, wallet, base58]);
 
+	const icon = useMemo(() => {
+		if (wallet) return wallet.adapter.icon;
+		else return null;
+	}, [wallet]);
+
 	const copyAddress = useCallback(async () => {
 		if (base58) {
 			await navigator.clipboard.writeText(base58);
@@ -155,16 +160,10 @@ const CustomWalletButton: FC<CustomWalletButtonProps> = ({ children }) => {
 				<Container className={classes.container} m={0} p={0}>
 					<Popover.Target>
 						<Button className={classes.button} h={48} onClick={handleClick}>
-							{wallet && (
-								<Image
-									src={wallet?.adapter.icon ?? ""}
-									width={24}
-									height={24}
-									alt="Solana Logo"
-									className={classes.logo}
-								/>
+							{icon && (
+								<Image src={icon} width={24} height={24} alt="Wallet Logo" className={classes.logo} />
 							)}
-							<span>{content}</span>
+							{content}
 						</Button>
 					</Popover.Target>
 				</Container>

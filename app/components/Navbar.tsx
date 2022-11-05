@@ -1,10 +1,10 @@
 import { createStyles, Navbar as MantineNavbar } from "@mantine/core";
 import { FC, PropsWithChildren } from "react";
 
-import CustomWalletButton from "./CustomWalletButton";
-import WalletMultiButton from "./nossr/WalletMultiButton";
-import Link from "next/link";
+import CustomWalletButton from "./nossr/CustomWalletButton";
 import NavbarLink from "./NavbarLink";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCoffee } from "@fortawesome/free-solid-svg-icons";
 
 interface NavbarProps extends PropsWithChildren {}
 
@@ -16,7 +16,7 @@ const useStyles = createStyles((theme) => ({
 	},
 }));
 
-const navbarLinks = [{ label: "Explore", icon: null }];
+const navbarLinks = [{ label: "Explore", icon: <FontAwesomeIcon icon={faCoffee} /> }];
 
 const Navbar: FC<NavbarProps> = () => {
 	const { classes } = useStyles();
