@@ -228,3 +228,12 @@ pub struct CreateImage<'info> {
 
     system_program: Program<'info, System>
 }
+
+#[derive(Accounts)]
+pub struct Withdraw<'info> {
+    #[account(mut)]
+    pub profile: Account<'info, states::Profile>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>
+}
