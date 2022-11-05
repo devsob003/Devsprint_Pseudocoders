@@ -52,7 +52,7 @@ mod parrhesia {
         
         let transaction_msg = anchor_lang::solana_program::system_instruction::transfer(
             &ctx.accounts.signer.key(),
-            &ctx.accounts.membership_plan.key(),
+            &ctx.accounts.authority.key(),
             ctx.accounts.membership_plan.amount
         );
 
@@ -61,7 +61,7 @@ mod parrhesia {
             &transaction_msg,
             &[
                 ctx.accounts.signer.to_account_info(),
-                ctx.accounts.membership_plan.to_account_info(),
+                ctx.accounts.authority.to_account_info(),
             ]
         );
         let membership_plan = &mut ctx.accounts.membership_plan;
