@@ -193,7 +193,7 @@ pub struct CreatePost<'info> {
     )]
     pub profile: Account<'info, states::Profile>,
 
-    #[account(init, payer=authority, space=10000)]
+    #[account(init, payer=authority, space=8 + std::mem::size_of::<states::Post>())]
     pub post : Account<'info, states::Post>,
 
     pub system_program: Program<'info, System>
@@ -210,7 +210,7 @@ pub struct DeletePost<'info> {
 
 #[derive(Accounts)]
 pub struct CreateComment<'info> {
-    #[account(init, payer=signer, space = 1000, seeds=[b"COMMENT".as_ref(), signer.key().as_ref()], bump)]
+    #[account(init, payer=signer, space = 1000)]
 
     pub comment: Account<'info, states::Comment>,
     
