@@ -198,3 +198,20 @@ pub struct DeleteComment<'info> {
     #[account(mut)]
     pub authority: Signer<'info>
 }
+
+
+
+
+#[derive(Accounts)]
+pub struct PostImage<'info> {
+    #[account(mut, has_one=authority)]
+    pub post: Account<'info, states::Post>,
+
+    #[account(init, payer=authority, space = 1000)]
+    pub image: Account<'info, states::Image>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
+    system_program: Program<'info, System>
+}
