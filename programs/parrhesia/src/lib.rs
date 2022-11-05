@@ -94,7 +94,20 @@ mod parrhesia {
     ) -> Result<()> {
         Ok(())
     }
+    
+    pub fn create_image(
+        ctx: Context<CreateImage>,
+        img_ref: String
+    ) -> Result<()> {
+        let image = &mut ctx.accounts.image;
+        let post = &mut ctx.accounts.post;
 
+        image.authority = ctx.accounts.authority.key();
+        image.post = post.key();
+        image.img_ref = img_ref;
+
+        Ok(())
+    }
 }
 
 
@@ -203,7 +216,7 @@ pub struct DeleteComment<'info> {
 
 
 #[derive(Accounts)]
-pub struct PostImage<'info> {
+pub struct CreateImage<'info> {
     #[account(mut, has_one=authority)]
     pub post: Account<'info, states::Post>,
 
