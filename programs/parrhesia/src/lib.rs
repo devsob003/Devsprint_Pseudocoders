@@ -108,6 +108,25 @@ mod parrhesia {
 
         Ok(())
     }
+
+    pub fn withdraw(
+        ctx: Context<Withdraw>,
+        amount: u64
+    ) -> Result<()> {
+        let profile = &mut ctx.accounts.profile;
+        let authority = &mut ctx.accounts.authority;
+
+        let rent_balance = Rent::get()?.minimum_balance(profile.to_account_info().data_len());
+
+        if **profile.to_account_info().lamports.borrow() - rent_balance < amount {
+            return Err(error::InsuffBalError::InvalidWithdrawAmount.into());
+        }
+        
+        **profile.to_account_info().try_borrow_mut_lamports()? -= amount;
+        **authority.to_account_info().try_borrow_mut_lamports()? += amount;
+        
+        Ok(())
+    }
 }
 
 
@@ -131,8 +150,8 @@ pub struct CreateMembershipPlan<'info> {
     
     #[account(
         mut,
-        seeds = [b"PROFILE_STATE", authority.key().as_ref()],
-        bump,
+        //seeds = [b"PROFILE_STATE", authority.key().as_ref()],
+        //bump,
         has_one = authority
     )]
     pub profile: Box<Account<'info, states::Profile>>,
@@ -141,8 +160,9 @@ pub struct CreateMembershipPlan<'info> {
         init, 
         payer=authority, 
         space=8 + std::mem::size_of::<states::MembershipPlan>(), 
-        seeds=[b"MEMBERSHIP_PLAN_STATE", authority.key().as_ref(), &[profile.membership_plan_count as u8].as_ref()], 
-        bump)]
+        //seeds=[b"MEMBERSHIP_PLAN_STATE", authority.key().as_ref(), &[profile.membership_plan_count as u8].as_ref()], 
+        //bump
+    )]
     pub membership_plan: Box<Account<'info, states::MembershipPlan>>,
     pub system_program: Program<'info, System>,
 }
@@ -166,14 +186,14 @@ pub struct CreatePost<'info> {
     pub authority: Signer<'info>,
 
     #[account(
-        mut,
-        seeds = [b"PROFILE_STATE", authority.key().as_ref()],
-        bump,
+        //mut,
+        //seeds = [b"PROFILE_STATE", authority.key().as_ref()],
+        //bump,
         has_one = authority
     )]
     pub profile: Account<'info, states::Profile>,
 
-    #[account(init, payer=authority, space=10000, seeds=[b"POST".as_ref(), authority.key().as_ref()], bump)]
+    #[account(init, payer=authority, space=10000)]
     pub post : Account<'info, states::Post>,
 
     pub system_program: Program<'info, System>
