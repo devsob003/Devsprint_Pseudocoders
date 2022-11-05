@@ -24,6 +24,7 @@ pub struct MembershipPlan {
 pub struct Post {
     pub authority: Pubkey,
     pub body: String,
+    pub boost_amt: u64
 }
 
 #[account]
