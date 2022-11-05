@@ -257,3 +257,20 @@ pub struct Withdraw<'info> {
     #[account(mut)]
     pub authority: Signer<'info>
 }
+
+
+
+#[derive(Accounts)]
+pub struct BoostPost<'info> {
+    #[account(mut, has_one=authority)]
+    pub post: Account<'info, states::Post>,
+
+    #[account(mut)]
+    pub authority: Account<'info, states::Profile>,
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    system_program: Program<'info, System>
+}
+
