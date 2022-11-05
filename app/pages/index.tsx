@@ -1,8 +1,6 @@
-import { Col, Container, Grid } from "@mantine/core";
-import { WalletConnectButton } from "@solana/wallet-adapter-react-ui";
+import { Container, Grid } from "@mantine/core";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import Navbar from "../components/Navbar";
-import WalletMultiButton from "../components/nossr/WalletMultiButton";
 import { useProgram } from "../hooks";
 
 export default function Home() {
