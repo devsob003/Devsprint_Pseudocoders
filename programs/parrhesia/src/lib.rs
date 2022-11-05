@@ -127,8 +127,28 @@ mod parrhesia {
         
         Ok(())
     }
-}
 
+    pub fn boost_post(ctx: Context<BoostPost>, amount: u64) -> Result<()> {
+        
+        let transaction_msg = anchor_lang::solana_program::system_instruction::transfer(
+            &ctx.accounts.signer.key(),
+            &ctx.accounts.authority.key(),
+            amount
+        );
+
+        anchor_lang::solana_program::program::invoke(
+            &transaction_msg,
+            &[
+                ctx.accounts.signer.to_account_info(),
+                ctx.accounts.authority.to_account_info(),
+            ]
+        );
+        let post = &mut ctx.accounts.post;
+        post.boost_amt += amount;
+        Ok(())
+    }
+
+}
 
 
 
