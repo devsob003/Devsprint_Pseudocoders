@@ -1,10 +1,8 @@
-import { FC, PropsWithChildren } from "react";
 import { createStyles, Navbar as MantineNavbar } from "@mantine/core";
-import WalletMultiButton from "./nossr/WalletMultiButton";
+import { FC, PropsWithChildren } from "react";
 
-import styles from "./Navbar.module.css";
-import { WalletConnectButton, WalletDisconnectButton, WalletModalButton } from "@solana/wallet-adapter-react-ui";
 import CustomWalletButton from "./CustomWalletButton";
+import WalletMultiButton from "./nossr/WalletMultiButton";
 
 interface NavbarProps extends PropsWithChildren {}
 
@@ -25,7 +23,6 @@ const Navbar: FC<NavbarProps> = () => {
 				<div>Hello</div>
 			</MantineNavbar.Section>
 			<MantineNavbar.Section>
-				{/* <WalletMultiButton /> */}
 				<CustomWalletButton />
 			</MantineNavbar.Section>
 		</MantineNavbar>

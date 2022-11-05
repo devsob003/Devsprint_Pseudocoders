@@ -1,10 +1,22 @@
-import { Button, Container, createStyles } from "@mantine/core";
+import { Button, Container, createStyles, Popover } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import Image from "next/image";
-import { FC } from "react";
+import {
+	FC,
+	forwardRef,
+	ForwardRefRenderFunction,
+	HTMLProps,
+	PropsWithChildren,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 
-interface CustomWalletButtonProps {}
+interface CustomWalletButtonProps extends PropsWithChildren {}
 
 const useStyles = createStyles((theme) => ({
 	container: {
@@ -27,32 +39,145 @@ const useStyles = createStyles((theme) => ({
 	logo: {
 		marginRight: 10,
 	},
+
+	dropdownContainer: {
+		background: "#512da8",
+		border: "none",
+		padding: 0,
+	},
+
+	dropdown_btn: {
+		width: "100%",
+		background: "transparent",
+		margin: 0,
+		height: "50px",
+
+		":hover": {
+			background: "#1a1f2e",
+		},
+	},
 }));
 
-const CustomWalletButton: FC<CustomWalletButtonProps> = () => {
+interface DropDownContentProps extends HTMLProps<HTMLDivElement> {
+	onCopy?: () => void;
+	onDisconnect?: () => void;
+	onSelectWallet?: () => void;
+}
+const DropdownContentWithRef: ForwardRefRenderFunction<HTMLDivElement, DropDownContentProps> = (
+	{ onCopy, onDisconnect, onSelectWallet },
+	ref
+) => {
 	const { classes } = useStyles();
-	const { publicKey, wallet, disconnect } = useWallet();
-	const { setVisible } = useWalletModal();
+	const [copied, setCopied] = useState<boolean>(false);
 
-	const onBtnClick = () => {
-		setVisible(true);
+	const onCopyHandler = () => {
+		if (onCopy) onCopy();
+		setCopied(true);
+		setTimeout(() => setCopied(false), 400);
 	};
 
 	return (
-		<Container className={classes.container} m={0} p={0}>
-			<Button className={classes.button} h={48} onClick={onBtnClick}>
-				<Image
-					src={
-						"data:image/svg+xml;base64,PHN2ZyBmaWxsPSJub25lIiBoZWlnaHQ9IjM0IiB3aWR0aD0iMzQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iLjUiIHgyPSIuNSIgeTE9IjAiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM1MzRiYjEiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM1NTFiZjkiLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0iYiIgeDE9Ii41IiB4Mj0iLjUiIHkxPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZmZmIiBzdG9wLW9wYWNpdHk9Ii44MiIvPjwvbGluZWFyR3JhZGllbnQ+PGNpcmNsZSBjeD0iMTciIGN5PSIxNyIgZmlsbD0idXJsKCNhKSIgcj0iMTciLz48cGF0aCBkPSJtMjkuMTcwMiAxNy4yMDcxaC0yLjk5NjljMC02LjEwNzQtNC45NjgzLTExLjA1ODE3LTExLjA5NzUtMTEuMDU4MTctNi4wNTMyNSAwLTEwLjk3NDYzIDQuODI5NTctMTEuMDk1MDggMTAuODMyMzctLjEyNDYxIDYuMjA1IDUuNzE3NTIgMTEuNTkzMiAxMS45NDUzOCAxMS41OTMyaC43ODM0YzUuNDkwNiAwIDEyLjg0OTctNC4yODI5IDEzLjk5OTUtOS41MDEzLjIxMjMtLjk2MTktLjU1MDItMS44NjYxLTEuNTM4OC0xLjg2NjF6bS0xOC41NDc5LjI3MjFjMCAuODE2Ny0uNjcwMzggMS40ODQ3LTEuNDkwMDEgMS40ODQ3LS44MTk2NCAwLTEuNDg5OTgtLjY2ODMtMS40ODk5OC0xLjQ4NDd2LTIuNDAxOWMwLS44MTY3LjY3MDM0LTEuNDg0NyAxLjQ4OTk4LTEuNDg0Ny44MTk2MyAwIDEuNDkwMDEuNjY4IDEuNDkwMDEgMS40ODQ3em01LjE3MzggMGMwIC44MTY3LS42NzAzIDEuNDg0Ny0xLjQ4OTkgMS40ODQ3LS44MTk3IDAtMS40OS0uNjY4My0xLjQ5LTEuNDg0N3YtMi40MDE5YzAtLjgxNjcuNjcwNi0xLjQ4NDcgMS40OS0xLjQ4NDcuODE5NiAwIDEuNDg5OS42NjggMS40ODk5IDEuNDg0N3oiIGZpbGw9InVybCgjYikiLz48L3N2Zz4K"
-					}
-					width={24}
-					height={24}
-					alt="Solana Logo"
-					className={classes.logo}
-				/>
-				<span>Connect</span>
+		<Container p={0} ref={ref}>
+			<Button className={classes.dropdown_btn} onClick={onCopyHandler}>
+				{copied ? "Copied" : "Copy address"}
+			</Button>
+			<Button className={classes.dropdown_btn} onClick={onSelectWallet}>
+				Change wallet
+			</Button>
+			<Button className={classes.dropdown_btn} onClick={onDisconnect}>
+				Disconnect
 			</Button>
 		</Container>
+	);
+};
+
+const DropdownContent = forwardRef(DropdownContentWithRef);
+
+const CustomWalletButton: FC<CustomWalletButtonProps> = ({ children }) => {
+	const { classes } = useStyles();
+	const { publicKey, wallet, disconnect, connecting, connected } = useWallet();
+	const { setVisible } = useWalletModal();
+	const [opened, { open, close }] = useDisclosure(false);
+	const dropDownRef = useRef<HTMLDivElement>(null);
+
+	const base58 = useMemo(() => publicKey?.toBase58(), [publicKey]);
+	const content = useMemo(() => {
+		if (children) return children;
+		if (connecting) return "Connecting...";
+		if (connected) {
+			return base58 ? base58.slice(0, 6) + "..." + base58.slice(-6) : "Connected";
+		}
+		if (wallet) return "Connect";
+		return "Select Wallet";
+	}, [children, connecting, connected, wallet, base58]);
+
+	const copyAddress = useCallback(async () => {
+		if (base58) {
+			await navigator.clipboard.writeText(base58);
+		}
+	}, [base58]);
+
+	const openModal = useCallback(() => {
+		setVisible(true);
+	}, [setVisible]);
+
+	const handleClick = () => {
+		if (!wallet) openModal();
+		open();
+	};
+
+	useEffect(() => {
+		const listener = (event: MouseEvent | TouchEvent) => {
+			const node = dropDownRef.current;
+
+			// Do nothing if clicking dropdown or its descendants
+			if (!node || node.contains(event.target as Node)) return;
+
+			close();
+		};
+
+		document.addEventListener("mousedown", listener);
+		document.addEventListener("touchstart", listener);
+
+		return () => {
+			document.removeEventListener("mousedown", listener);
+			document.removeEventListener("touchstart", listener);
+		};
+	});
+
+	useEffect(() => {
+		if (!connected) close();
+	}, [connected, close]);
+
+	return (
+		<>
+			<Popover width="target" position="top-end" shadow="md" opened={opened}>
+				<Container className={classes.container} m={0} p={0}>
+					<Popover.Target>
+						<Button className={classes.button} h={48} onClick={handleClick}>
+							{wallet && (
+								<Image
+									src={wallet?.adapter.icon ?? ""}
+									width={24}
+									height={24}
+									alt="Solana Logo"
+									className={classes.logo}
+								/>
+							)}
+							<span>{content}</span>
+						</Button>
+					</Popover.Target>
+				</Container>
+				<Popover.Dropdown className={classes.dropdownContainer} m={0}>
+					<DropdownContent
+						ref={dropDownRef}
+						onCopy={copyAddress}
+						onDisconnect={disconnect}
+						onSelectWallet={openModal}
+					/>
+				</Popover.Dropdown>
+			</Popover>
+		</>
 	);
 };
 
