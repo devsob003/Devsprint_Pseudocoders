@@ -1,11 +1,10 @@
-import { ClassNames } from "@emotion/react";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createStyles, Text } from "@mantine/core";
 import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FC, ReactNode } from "react";
+import { FC } from "react";
 
 interface NavbarLinkProps {
 	label: string;

@@ -1,16 +1,17 @@
-import { Button, createStyles, Navbar as MantineNavbar } from "@mantine/core";
-import { FC, PropsWithChildren, useEffect, useState } from "react";
+import { Button, createStyles, Modal, Navbar as MantineNavbar } from "@mantine/core";
+import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
 
-import CustomWalletButton from "./nossr/CustomWalletButton";
-import NavbarLink from "./NavbarLink";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGhost, faHashtag } from "@fortawesome/free-solid-svg-icons";
-import { useProgram } from "../hooks";
-import { PublicKey } from "@solana/web3.js";
 import { Program } from "@project-serum/anchor";
-import { PROFILE_STATE } from "../constants/seeds";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
+import { PublicKey, SystemProgram } from "@solana/web3.js";
+import Link from "next/link";
+import { PROFILE_STATE } from "../constants/seeds";
+import { useProgram } from "../hooks";
+import NavbarLink from "./NavbarLink";
+import CustomWalletButton from "./nossr/CustomWalletButton";
+import CreateProfileForm from "./CreateProfileForm";
 
 interface NavbarProps extends PropsWithChildren {}
 
@@ -57,6 +58,7 @@ const Navbar: FC<NavbarProps> = () => {
 	const { publicKey, program } = useProgram();
 	const anchorWallet = useAnchorWallet();
 	const [isCreator, setIsCreator] = useState<boolean>();
+	const [createProfileModalOpened, setCreateProfileModalOpened] = useState<boolean>(false);
 
 	useEffect(() => {
 		setIsCreator(false);
@@ -70,21 +72,65 @@ const Navbar: FC<NavbarProps> = () => {
 			});
 	}, [anchorWallet, setIsCreator, publicKey, program]);
 
+	const handleBecomeCreatorBtn = () => {
+		setCreateProfileModalOpened(true);
+	};
+
+	const createProfile = useCallback(
+		async ({ name, bio }: { name: string; bio: string }) => {
+			if (!program || !publicKey) return;
+
+			const [profilePda, profileBump] = await findProgramAddressSync(
+				[PROFILE_STATE, publicKey.toBuffer()],
+				program.programId
+			);
+
+			const tx = await program.methods
+				.createProfile(name, bio)
+				.accounts({
+					profile: profilePda,
+					signer: publicKey,
+					systemProgram: SystemProgram.programId,
+				})
+				.rpc();
+			setCreateProfileModalOpened(false);
+		},
+		[program, publicKey]
+	);
+
 	return (
-		<MantineNavbar
-			width={{ base: "100%" }}
-			height="100%"
-			style={{ background: "transparent", border: "none", padding: 8 }}>
-			<MantineNavbar.Section grow>{links}</MantineNavbar.Section>
-			<MantineNavbar.Section>
-				{isCreator && (
-					<Button variant="outline" uppercase component="a" href="/profile" className={classes.profile_btn}>
-						Profile
-					</Button>
-				)}
-				<CustomWalletButton />
-			</MantineNavbar.Section>
-		</MantineNavbar>
+		<>
+			<MantineNavbar
+				width={{ base: "100%" }}
+				height="100%"
+				style={{ background: "transparent", border: "none", padding: 8 }}>
+				<MantineNavbar.Section grow>{links}</MantineNavbar.Section>
+				<MantineNavbar.Section>
+					{isCreator ? (
+						<Button
+							variant="outline"
+							uppercase
+							component={Link}
+							href="/profile"
+							className={classes.profile_btn}>
+							Profile
+						</Button>
+					) : (
+						<Button
+							variant="outline"
+							uppercase
+							className={classes.profile_btn}
+							onClick={handleBecomeCreatorBtn}>
+							Become a creator
+						</Button>
+					)}
+					<CustomWalletButton />
+				</MantineNavbar.Section>
+			</MantineNavbar>
+			<Modal opened={createProfileModalOpened} onClose={() => setCreateProfileModalOpened(false)}>
+				<CreateProfileForm onSubmit={(values) => createProfile(values)} />
+			</Modal>
+		</>
 	);
 };
 

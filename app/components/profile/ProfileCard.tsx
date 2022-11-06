@@ -45,7 +45,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ profile }) => {
 		<Card className={classes.container}>
 			<Card.Section
 				className={classes.header}
-				component="a"
+				component={Link}
 				href={"/profile/" + profile?.account.authority.toString()}>
 				<Text color="#c8b2ff" fz="xl">
 					{profile?.account.name ?? "Loading..."}

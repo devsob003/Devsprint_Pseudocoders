@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Container, createStyles, Loader } from "@mantine/core";
 import { Program } from "@project-serum/anchor";
 import { useEffect, useState } from "react";
-import ProfileCard from "../../components/profile/Profile";
+import ProfileCard from "../../components/profile/ProfileCard";
 import { useProgram } from "../../hooks";
 
 const useStyles = createStyles((theme) => ({
@@ -63,8 +63,8 @@ export default function Creators() {
 				) : (
 					<Container className={classes.container} p={0}>
 						{profiles?.map((profile) => (
-						<ProfileCard profile={profile} key={profile.publicKey.toString()} />
-					))}
+							<ProfileCard profile={profile} key={profile.publicKey.toString()} />
+						))}
 					</Container>
 				)
 			) : (
