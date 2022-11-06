@@ -1,5 +1,4 @@
-## Chainpost
-Future is here
+<h1 align='center'>Chainpost</h1>
 
 ## Track
 
