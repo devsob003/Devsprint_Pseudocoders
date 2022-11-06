@@ -10,7 +10,7 @@ config.autoAddCss = false; /* eslint-disable import/first */
 
 export default function App({ Component, pageProps }: AppProps) {
 	return (
-		<WalletContext network="http://localhost:8899">
+		<WalletContext network="https://api.devnet.solana.com">
 			<MainLayoutProvider>
 				<Component {...pageProps} />
 			</MainLayoutProvider>

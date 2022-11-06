@@ -50,7 +50,6 @@ export default function Home({ data }: { data: any }) {
 		if (!program || !publicKey || feedLoaded) return;
 		getAllPosts(program)
 			.then((posts) => {
-				console.log(posts);
 				setPosts(posts);
 			})
 			.finally(() => {
