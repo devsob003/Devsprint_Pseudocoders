@@ -56,7 +56,7 @@ const Post: FC<PostProps> = ({ post }) => {
 	const postRef = useRef(null);
 	const isOnScreen = useOnScreen(postRef);
 	const [profile, setProfile] = useState<any>(null);
-	const { program } = useProgram();
+	const { publicKey, program } = useProgram();
 
 	useEffect(() => {
 		// only load the profile names when the post is in viewport
@@ -93,7 +93,7 @@ const Post: FC<PostProps> = ({ post }) => {
 			</Card.Section>
 			<CardSection className={classes.actions}>
 				<Group>
-					<LikeButton likes={0} />
+					<LikeButton postPublicKey={post.publicKey.toString()} />
 				</Group>
 			</CardSection>
 		</Card>
