@@ -1,3 +1,17 @@
+##Chainpost
+
+## Track
+
+#Bleeding Edge
+
+## Problem Statement
+
+Content creators generally rely on advertisement and sponsorships for generating revenue for their work and sustaining their livelihood, resulting in bad user experience and indulging in deceptive marketing for the companies sponsoring them.
+
+## Problem Description
+
+ Decentralized membership platform for content creators.
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
