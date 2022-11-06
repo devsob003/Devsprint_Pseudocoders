@@ -14,6 +14,14 @@ Content creators generally rely on advertisement and sponsorships for generating
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Frameworks
+
+- SOLANA blockchain using the anchor framework (Rust)
+- CARGO - To built the Onchain app  
+- PHANTOM WALLET - For user authentication
+- Netlify - To deploy the app and host it
+- IPFS database to store our user's profiles
+
 ## Getting Started
 
 First, run the development server:
