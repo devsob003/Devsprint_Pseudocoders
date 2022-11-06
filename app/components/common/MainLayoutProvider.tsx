@@ -32,10 +32,7 @@ const MainLayoutProvider: FC<MainLayoutProviderProps> = ({ children }) => {
 				p={0}
 				m={0}>
 				<Grid style={{ minHeight: "100vh" }} m={0}>
-					<Grid.Col
-						xs={2}
-						style={{ background: "#2c2f33", position: "relative", borderLeft: "1px solid #23272a" }}
-						p={0}>
+					<Grid.Col xs={2} style={{ background: "#2c2f33", position: "relative" }} p={0}>
 						<Container
 							style={{
 								position: "sticky",
@@ -50,7 +47,7 @@ const MainLayoutProvider: FC<MainLayoutProviderProps> = ({ children }) => {
 					<Grid.Col xs={7} style={{ background: "#23272a" }}>
 						{children}
 					</Grid.Col>
-					<Grid.Col xs={3} style={{ background: "#2c2f33", borderRight: "1px solid #23272a" }}>
+					<Grid.Col xs={3} style={{ background: "#2c2f33" }}>
 						{rightSide}
 					</Grid.Col>
 				</Grid>
