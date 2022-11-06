@@ -3,7 +3,10 @@ use anchor_lang::prelude::*;
 #[error_code]
 pub enum AppError {
     #[msg("Not allowed")]
-    NotAllowed
+    NotAllowed,
+
+    #[msg("Not allowed")]
+    SizeExceeded
 }
 
 #[error_code]

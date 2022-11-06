@@ -2,13 +2,13 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-parrhesia = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+parrhesia = "38GqxzBxn9bThohV7kd78BBHr8VAkaBwhS1HzMNNR28n"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "/home/_amitayas_/.config/solana/id.json"
 
 [scripts]

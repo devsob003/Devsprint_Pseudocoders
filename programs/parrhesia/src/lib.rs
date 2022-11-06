@@ -7,7 +7,7 @@ use crate::{error::*};
 
 // This is your program's public key and it will update
 // automatically when you build the project.
-declare_id!("9ZCyv2foD3uoZAK2WjC6dkTPx3krCi5K25iUF1ska6TW");
+declare_id!("38GqxzBxn9bThohV7kd78BBHr8VAkaBwhS1HzMNNR28n");
 
 #[program]
 mod parrhesia {
@@ -52,7 +52,7 @@ mod parrhesia {
         
         let transaction_msg = anchor_lang::solana_program::system_instruction::transfer(
             &ctx.accounts.signer.key(),
-            &ctx.accounts.membership_plan.key(),
+            &ctx.accounts.authority.key(),
             ctx.accounts.membership_plan.amount
         );
 
@@ -61,7 +61,7 @@ mod parrhesia {
             &transaction_msg,
             &[
                 ctx.accounts.signer.to_account_info(),
-                ctx.accounts.membership_plan.to_account_info(),
+                ctx.accounts.authority.to_account_info(),
             ]
         );
         let membership_plan = &mut ctx.accounts.membership_plan;
@@ -74,9 +74,13 @@ mod parrhesia {
         body: String
     ) -> Result<()> {
         
+        if(body.chars().count() > 300) {return err!(error::AppError::SizeExceeded);};
+
         let post = &mut ctx.accounts.post;
         post.authority = ctx.accounts.authority.key();
         post.body = body;
+        post.timestamp = Clock::get().unwrap().unix_timestamp;
+        post.boost_amt = 0;
 
         Ok(())
     }
@@ -92,6 +96,19 @@ mod parrhesia {
         ctx: Context<CreateComment>,
         body: String
     ) -> Result<()> {
+        
+        
+        if(body.chars().count() > 300) { return err!(error::AppError::SizeExceeded); };
+
+        let comment = &mut ctx.accounts.comment;
+        let post = &mut ctx.accounts.post;
+        let authority = &mut ctx.accounts.authority;
+
+        comment.authority = authority.key();
+        comment.post = post.key();
+        comment.body = body;
+        comment.timestamp = Clock::get().unwrap().unix_timestamp;
+
         Ok(())
     }
     
@@ -127,8 +144,28 @@ mod parrhesia {
         
         Ok(())
     }
-}
 
+    pub fn boost_post(ctx: Context<BoostPost>, amount: u64) -> Result<()> {
+        
+        let transaction_msg = anchor_lang::solana_program::system_instruction::transfer(
+            &ctx.accounts.signer.key(),
+            &ctx.accounts.authority.key(),
+            amount
+        );
+
+        anchor_lang::solana_program::program::invoke(
+            &transaction_msg,
+            &[
+                ctx.accounts.signer.to_account_info(),
+                ctx.accounts.authority.to_account_info(),
+            ]
+        );
+        let post = &mut ctx.accounts.post;
+        post.boost_amt += amount;
+        Ok(())
+    }
+
+}
 
 
 
@@ -181,22 +218,16 @@ pub struct BuyMembership<'info> {
 
 #[derive(Accounts)]
 pub struct CreatePost<'info> {
+    #[account(init, payer=authority, space=8 + std::mem::size_of::<states::Post>())]
+    pub post: Account<'info, states::Post>,
+
+    #[account(mut, has_one=authority)]
+    pub profile: Account<'info, states::Profile>,
 
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    #[account(
-        //mut,
-        //seeds = [b"PROFILE_STATE", authority.key().as_ref()],
-        //bump,
-        has_one = authority
-    )]
-    pub profile: Account<'info, states::Profile>,
-
-    #[account(init, payer=authority, space=8 + std::mem::size_of::<states::Post>())]
-    pub post : Account<'info, states::Post>,
-
-    pub system_program: Program<'info, System>
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -210,15 +241,17 @@ pub struct DeletePost<'info> {
 
 #[derive(Accounts)]
 pub struct CreateComment<'info> {
-    #[account(init, payer=signer, space = 1000)]
-
+    #[account(init, payer=authority, space = 8 + std::mem::size_of::<states::Comment>())]
     pub comment: Account<'info, states::Comment>,
     
     #[account()]
     pub post: Account<'info, states::Post>,
 
+    #[account(has_one=authority)]
+    pub profile: Account<'info, states::Profile>,
+
     #[account(mut)]
-    pub signer: Signer<'info>,
+    pub authority: Signer<'info>,
 
     pub system_program: Program<'info, System>
 }
@@ -240,7 +273,7 @@ pub struct CreateImage<'info> {
     #[account(mut, has_one=authority)]
     pub post: Account<'info, states::Post>,
 
-    #[account(init, payer=authority, space = 1000)]
+    #[account(init, payer=authority, space =  8 + std::mem::size_of::<states::Image>())]
     pub image: Account<'info, states::Image>,
 
     #[account(mut)]
@@ -257,3 +290,20 @@ pub struct Withdraw<'info> {
     #[account(mut)]
     pub authority: Signer<'info>
 }
+
+
+
+#[derive(Accounts)]
+pub struct BoostPost<'info> {
+    #[account(mut, has_one=authority)]
+    pub post: Account<'info, states::Post>,
+
+    #[account(mut)]
+    pub authority: Account<'info, states::Profile>,
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    system_program: Program<'info, System>
+}
+
