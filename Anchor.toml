@@ -2,7 +2,7 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-parrhesia = "38GqxzBxn9bThohV7kd78BBHr8VAkaBwhS1HzMNNR28n"
+parrhesia = "7u18B2KUkivrUCegw5KEKNCNjjCYVmukeBx4Sh8rfBWC"
 
 [registry]
 url = "https://api.apr.dev"
