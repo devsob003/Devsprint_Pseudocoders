@@ -24,7 +24,8 @@ pub struct MembershipPlan {
 pub struct Post {
     pub authority: Pubkey,
     pub body: String,
-    pub boost_amt: u64
+    pub boost_amt: u64,
+    pub timestamp: i64,
 }
 
 #[account]
@@ -41,5 +42,6 @@ pub struct Image {
 pub struct Comment {
     pub authority: Pubkey,
     pub body: String,
-    pub post: Pubkey
+    pub post: Pubkey,
+    pub timestamp: i64,
 }

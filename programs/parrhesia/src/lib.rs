@@ -7,7 +7,7 @@ use crate::{error::*};
 
 // This is your program's public key and it will update
 // automatically when you build the project.
-declare_id!("9ZCyv2foD3uoZAK2WjC6dkTPx3krCi5K25iUF1ska6TW");
+declare_id!("38GqxzBxn9bThohV7kd78BBHr8VAkaBwhS1HzMNNR28n");
 
 #[program]
 mod parrhesia {
@@ -74,11 +74,12 @@ mod parrhesia {
         body: String
     ) -> Result<()> {
         
-        if(body.len() > 300) {return err!(error::AppError::SizeExceeded);}
+        if(body.chars().count() > 300) {return err!(error::AppError::SizeExceeded);};
 
         let post = &mut ctx.accounts.post;
         post.authority = ctx.accounts.authority.key();
         post.body = body;
+        post.timestamp = Clock::get().unwrap().unix_timestamp;
         post.boost_amt = 0;
 
         Ok(())
@@ -95,6 +96,19 @@ mod parrhesia {
         ctx: Context<CreateComment>,
         body: String
     ) -> Result<()> {
+        
+        
+        if(body.chars().count() > 300) { return err!(error::AppError::SizeExceeded); };
+
+        let comment = &mut ctx.accounts.comment;
+        let post = &mut ctx.accounts.post;
+        let authority = &mut ctx.accounts.authority;
+
+        comment.authority = authority.key();
+        comment.post = post.key();
+        comment.body = body;
+        comment.timestamp = Clock::get().unwrap().unix_timestamp;
+
         Ok(())
     }
     
@@ -204,22 +218,16 @@ pub struct BuyMembership<'info> {
 
 #[derive(Accounts)]
 pub struct CreatePost<'info> {
+    #[account(init, payer=authority, space=8 + std::mem::size_of::<states::Post>())]
+    pub post: Account<'info, states::Post>,
+
+    #[account(mut, has_one=authority)]
+    pub profile: Account<'info, states::Profile>,
 
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    #[account(
-        //mut,
-        //seeds = [b"PROFILE_STATE", authority.key().as_ref()],
-        //bump,
-        has_one = authority
-    )]
-    pub profile: Account<'info, states::Profile>,
-
-    #[account(init, payer=authority, space=8 + std::mem::size_of::<states::Post>())]
-    pub post : Account<'info, states::Post>,
-
-    pub system_program: Program<'info, System>
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -233,15 +241,17 @@ pub struct DeletePost<'info> {
 
 #[derive(Accounts)]
 pub struct CreateComment<'info> {
-    #[account(init, payer=signer, space = 1000)]
-
+    #[account(init, payer=authority, space = 8 + std::mem::size_of::<states::Comment>())]
     pub comment: Account<'info, states::Comment>,
     
     #[account()]
     pub post: Account<'info, states::Post>,
 
+    #[account(has_one=authority)]
+    pub profile: Account<'info, states::Profile>,
+
     #[account(mut)]
-    pub signer: Signer<'info>,
+    pub authority: Signer<'info>,
 
     pub system_program: Program<'info, System>
 }
@@ -263,7 +273,7 @@ pub struct CreateImage<'info> {
     #[account(mut, has_one=authority)]
     pub post: Account<'info, states::Post>,
 
-    #[account(init, payer=authority, space = 1000)]
+    #[account(init, payer=authority, space =  8 + std::mem::size_of::<states::Image>())]
     pub image: Account<'info, states::Image>,
 
     #[account(mut)]
