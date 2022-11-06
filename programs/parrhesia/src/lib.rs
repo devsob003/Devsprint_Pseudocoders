@@ -74,9 +74,12 @@ mod parrhesia {
         body: String
     ) -> Result<()> {
         
+        if(body.len() > 300) {return err!(error::AppError::SizeExceeded);}
+
         let post = &mut ctx.accounts.post;
         post.authority = ctx.accounts.authority.key();
         post.body = body;
+        post.boost_amt = 0;
 
         Ok(())
     }
