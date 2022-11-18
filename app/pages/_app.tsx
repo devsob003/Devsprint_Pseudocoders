@@ -8,6 +8,8 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 config.autoAddCss = false; /* eslint-disable import/first */
 
+import "@solana/wallet-adapter-react-ui/styles.css";
+	
 export default function App({ Component, pageProps }: AppProps) {
 	return (
 		<WalletContext network="https://api.devnet.solana.com">
